@@ -1,0 +1,122 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
+
+<!--
+An element providing a solution to no problem in particular.
+
+Example:
+
+    <paper-interval-slider></paper-interval-slider>
+
+Example:
+
+    <paper-interval-slider>
+      <h2>Hello paper-interval-slider</h2>
+    </paper-interval-slider>
+
+@demo demo/index.html
+@hero hero.svg
+-->
+
+<dom-module id="paper-interval-slider">
+    <template>
+        <style>
+            :host {
+                display: block;
+                box-sizing: border-box;
+                cursor: pointer;
+            }
+
+            #slideBar {
+                width: 100%;
+                height: 3px;
+                background: grey;
+                border-radius: 5px;
+            }
+
+            .knob {
+                width: 15px;
+                height: 15px;
+                background: red;
+                position: absolute;
+                border-radius: 50%;
+                top: -7px;
+            }
+        </style>
+
+        <div id="slideBar">
+            <iron-selector attr-for-selected="id" selected="{{selected}}">
+                <div id="knob1" class="knob" style$="left:[[knob1]]%;" on-track="_moveKnob"></div>
+                <div id="knob2" class="knob" style$="left:[[knob2]]%;" on-track="_moveKnob"></div>
+            </iron-selector>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'paper-interval-slider',
+
+            properties: {
+                max: {
+                    type: Number,
+                    value: 25
+                },
+                knob1: {
+                    type: Number,
+                    value: 0
+                },
+                knob2: {
+                    type: Number,
+                    value: 99
+                }
+            },
+            _moveKnob: function (e) {
+                var slideWidth = this.$.slideBar.offsetWidth;
+                var rect = this.$.slideBar.getBoundingClientRect();
+                var ratio = ((e.detail.x - rect.left) / slideWidth) * 100;
+                var element = e.target.id;
+                this._currentElement(element, ratio);
+
+            },
+
+            _currentElement: function (id, ratio) {
+                if (id == 'knob1') {
+                    this.knob1 = ratio;
+                    if (ratio < 0) {
+                        this.knob1 = 0;
+                    } else if (ratio > 100) {
+                        this.knob1 = 100;
+                    }
+                    if (this.knob1 >= this.knob2) {
+                        this.knob1 = this.knob2 - 1;
+                    }
+                    return;
+                } else if (id == 'knob2') {
+                    this.knob2 = ratio;
+                    if (ratio < 0) {
+                        this.knob2 = 0;
+                    } else if (ratio > 100) {
+                        this.knob2 = 100;
+                    }
+                    if (this.knob2 <= this.knob1) {
+                        this.knob2 = this.knob1 + 1;
+                    }
+                    return;
+                } else {
+                    return;
+                }
+            }
+
+        });
+    </script>
+</dom-module>
