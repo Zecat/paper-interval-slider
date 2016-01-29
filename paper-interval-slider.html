@@ -11,6 +11,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-styles/color.html">
 
 <!--
 An element providing a solution to no problem in particular.
@@ -40,8 +41,8 @@ Example:
       }
 
       #slideBar {
-        height: 3px;
-        background: grey;
+        height: var(--paper-slider-height, 2px);
+        background-color: var(--paper-slider-bar-color, --paper-grey-400);
         border-radius: 5px;
         @apply(--layout-flex);
         position: relative;
@@ -50,16 +51,16 @@ Example:
       .knob {
         width: 15px;
         height: 15px;
-        background: red;
+        background: var(--paper-slider-knob-color, --google-blue-700);
         position: absolute;
         border-radius: 50%;
         top: -7px;
         z-index: 10;
       }
       #intervalBar{
-        height:3px;
+        height: var(--paper-slider-height, 2px);
         position: absolute;
-        background: blue;
+        background: var(--paper-slider-active-color, --google-blue-700);
       }
       #knobSelector{
         display: block;
