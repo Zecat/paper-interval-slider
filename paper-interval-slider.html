@@ -51,14 +51,32 @@ Example:
                 position: absolute;
                 border-radius: 50%;
                 top: -7px;
+                z-index: 10;
+            }
+            #intervalBar{
+                height:3px;
+                position: absolute;
+                background: blue;
+            }
+            #knobSelector{
+                display: block;
+            }
+            .knobValue{
+                position: absolute;
+                top:-20px;
             }
         </style>
 
         <div id="slideBar">
-            <iron-selector attr-for-selected="id" selected="{{selected}}">
-                <div id="knob1" class="knob" style$="left:[[knob1]]%;" on-track="_moveKnob"></div>
-                <div id="knob2" class="knob" style$="left:[[knob2]]%;" on-track="_moveKnob"></div>
+            <iron-selector id="knobSelector" attr-for-selected="id" selected="{{selected}}">
+                <div id="knob1" class="knob" style$="left:calc([[knob1Ratio]]% - [[knobRay]]px);"  on-track="_moveKnob" on-down="_selectKnob">
+                    <div class="knobValue">[[knob1Value]]</div>
+                </div>
+                <div id="knob2" class="knob" style$="left:calc([[knob2Ratio]]% - [[knobRay]]px);"  on-track="_moveKnob" on-down="_selectKnob">
+                    <div class="knobValue">[[knob2Value]]</div>
+                </div>
             </iron-selector>
+            <div id="intervalBar" style$="left:[[knob1Ratio]]%;right:calc(100% - [[knob2Ratio]]%)"></div>
         </div>
     </template>
 
@@ -67,54 +85,80 @@ Example:
             is: 'paper-interval-slider',
 
             properties: {
-                max: {
+                maxValue: {
                     type: Number,
-                    value: 25
+                    value: 250
                 },
-                knob1: {
+                minValue:{
+                    type:Number,
+                    value:0
+                },
+                slideBarWidth:{
+                  type:Number
+                },
+                slideBarX:{
+                    type:Number
+                },
+                knobRay:{
+                    type:Number,
+                    value:7.5
+                },
+                knob1Ratio: {
                     type: Number,
                     value: 0
                 },
-                knob2: {
+                knob2Ratio: {
                     type: Number,
-                    value: 99
+                    value: 100
+                },
+                knob1Value:{
+                    type:Number,
+                    computed:'_computeKnobValue(knob1Ratio,minValue,maxValue)',
+                },
+                knob2Value:{
+                    type:Number,
+                    computed:'_computeKnobValue(knob2Ratio,minValue,maxValue)'
                 }
+            },
+
+            attached:function(){
+               this.slideBarWidth = this.$.slideBar.offsetWidth+2*this.$$('.knob').style.width;
+                this.slideBarX= this.$.slideBar.getBoundingClientRect().left;
+            },
+            _selectKnob: function(e){
+                e.preventDefault();
+                this.$.knobSelector.select(e.srcElement.id);
             },
             _moveKnob: function (e) {
-                var slideWidth = this.$.slideBar.offsetWidth;
-                var rect = this.$.slideBar.getBoundingClientRect();
-                var ratio = ((e.detail.x - rect.left) / slideWidth) * 100;
-                var element = e.target.id;
-                this._currentElement(element, ratio);
-
+                var ratio = ((e.detail.x - this.slideBarX) / this.slideBarWidth) * 100;
+                this._currentElement(ratio);
             },
 
-            _currentElement: function (id, ratio) {
-                if (id == 'knob1') {
-                    this.knob1 = ratio;
+            _currentElement: function (ratio) {
+                if (this.$.knobSelector.selected == 'knob1') {
+                    this.knob1Ratio = ratio;
                     if (ratio < 0) {
-                        this.knob1 = 0;
+                        this.knob1Ratio = 0;
                     } else if (ratio > 100) {
-                        this.knob1 = 100;
+                        this.knob1Ratio = 100;
                     }
-                    if (this.knob1 >= this.knob2) {
-                        this.knob1 = this.knob2 - 1;
+                    if (this.knob1Ratio >= this.knob2Ratio) {
+                        this.knob1Ratio = this.knob2Ratio - 1;
                     }
-                    return;
-                } else if (id == 'knob2') {
-                    this.knob2 = ratio;
+                } else if (this.$.knobSelector.selected == 'knob2') {
+                    this.knob2Ratio = ratio;
                     if (ratio < 0) {
-                        this.knob2 = 0;
+                        this.knob2Ratio = 0;
                     } else if (ratio > 100) {
-                        this.knob2 = 100;
+                        this.knob2Ratio = 100;
                     }
-                    if (this.knob2 <= this.knob1) {
-                        this.knob2 = this.knob1 + 1;
+                    if (this.knob2Ratio <= this.knob1Ratio) {
+                        this.knob2Ratio = this.knob1Ratio + 1;
                     }
-                    return;
-                } else {
-                    return;
                 }
+            },
+            _computeKnobValue:function(knobRatio,min,max){
+                return Math.floor((knobRatio*(max-min))/100);
             }
 
         });
