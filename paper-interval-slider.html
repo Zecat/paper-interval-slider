@@ -10,6 +10,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 
 <!--
 An element providing a solution to no problem in particular.
@@ -35,13 +36,15 @@ Example:
         display: block;
         box-sizing: border-box;
         cursor: pointer;
+        @apply(--layout-horizontal);
       }
 
       #slideBar {
-        width: 100%;
         height: 3px;
         background: grey;
         border-radius: 5px;
+        @apply(--layout-flex);
+        position: relative;
       }
 
       .knob {
@@ -80,6 +83,7 @@ Example:
     </div>
   </template>
 
+  
   <script>
     Polymer({
       is: 'paper-interval-slider',
