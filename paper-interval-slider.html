@@ -72,11 +72,11 @@ Example:
     </style>
 
     <div id="slideBar">
-      <iron-selector id="knobSelector" attr-for-selected="id" selected="{{selected}}">
-        <div id="knob1" class="knob" style$="left:calc([[knob1Ratio]]% - [[knobRay]]px);"  on-track="_moveKnob" on-down="_selectKnob">
+      <iron-selector id="knobSelector" selectedValues multi>
+        <div class="knob" style$="left:calc([[knob1Ratio]]% - [[knobRay]]px);" on-track="_moveKnob" on-down="_selectKnob">
           <div class="knobValue">[[knob1Value]]</div>
         </div>
-        <div id="knob2" class="knob" style$="left:calc([[knob2Ratio]]% - [[knobRay]]px);"  on-track="_moveKnob" on-down="_selectKnob">
+        <div class="knob" style$="left:calc([[knob2Ratio]]% - [[knobRay]]px);" on-track="_moveKnob" on-down="_selectKnob">
           <div class="knobValue">[[knob2Value]]</div>
         </div>
       </iron-selector>
@@ -132,7 +132,9 @@ Example:
       },
       _selectKnob: function(e){
         e.preventDefault();
-        this.$.knobSelector.select(e.srcElement.id);
+        var selector = this.$.knobSelector;
+        selector.selectedValues = [];
+        selector.select(selector.indexOf(e.srcElement));
       },
       _moveKnob: function (e) {
         var ratio = ((e.detail.x - this.slideBarX) / this.slideBarWidth) * 100;
@@ -140,7 +142,7 @@ Example:
       },
 
       _currentElement: function (ratio) {
-        if (this.$.knobSelector.selected == 'knob1') {
+        if (this.$.knobSelector.selectedValues[0] == 0) {
           this.knob1Ratio = ratio;
           if (ratio < 0) {
             this.knob1Ratio = 0;
@@ -150,7 +152,7 @@ Example:
           if (this.knob1Ratio >= this.knob2Ratio) {
             this.knob1Ratio = this.knob2Ratio - 1;
           }
-        } else if (this.$.knobSelector.selected == 'knob2') {
+        } else if (this.$.knobSelector.selectedValues[0] == 1) {
           this.knob2Ratio = ratio;
           if (ratio < 0) {
             this.knob2Ratio = 0;
